@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "deliverooClone",
-    "slug": "deliverooClone",
+    "name": "mobile-app",
+    "slug": "mobile-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
