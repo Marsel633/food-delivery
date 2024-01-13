@@ -20,5 +20,6 @@ export default {
     lightGrey: '#fcf8ff',
     grey: 'eee90f',
     medium: '#9f9aa1',
+    mediumDark: '#424242',
     green: '#437919',
 };
