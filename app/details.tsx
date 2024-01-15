@@ -19,6 +19,8 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import useBasketStore from "@/store/basketStore";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Details = () => {
   const navigation = useNavigation();
@@ -36,6 +38,8 @@ const Details = () => {
     data: item.meals,
     index,
   }));
+
+  const { items, total } = useBasketStore();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -67,8 +71,8 @@ const Details = () => {
     const selected = itemsRef.current[index];
     setActiveIndex(index);
     selected.measure((x) => {
-        scrollRef.current?.scrollTo({x: x - 16, y: 0, animated: true})
-    })
+      scrollRef.current?.scrollTo({ x: x - 16, y: 0, animated: true });
+    });
   };
 
   const onScroll = (event: any) => {
@@ -81,7 +85,13 @@ const Details = () => {
   };
 
   const renderItem: ListRenderItem<any> = ({ item, index }) => (
-    <Link href={"/"} asChild>
+    <Link
+      href={{
+        pathname: "/(modal)/dish",
+        params: { id: item.id },
+      }}
+      asChild
+    >
       <TouchableOpacity style={styles.item}>
         <View style={{ flex: 1 }}>
           <Text style={styles.dish}>{item.name}</Text>
@@ -98,7 +108,7 @@ const Details = () => {
   return (
     <>
       <ParallaxScrollView
-      scrollEvent={onScroll}
+        scrollEvent={onScroll}
         backgroundColor={"#fff"}
         parallaxHeaderHeight={250}
         stickyHeaderHeight={100}
@@ -155,17 +165,18 @@ const Details = () => {
           />
         </View>
       </ParallaxScrollView>
+      {/* Sticky Segment */}
       <Animated.View style={[styles.stickySegments, animatedStyles]}>
         <View style={styles.segmentsShadow}>
           <ScrollView
-          ref={scrollRef}
+            ref={scrollRef}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.segmentScrollView}
           >
             {restaurant.food.map((item, index) => (
               <TouchableOpacity
-              ref={ref => itemsRef.current[index] = ref!}
+                ref={(ref) => (itemsRef.current[index] = ref!)}
                 key={index}
                 style={
                   activeIndex === index
@@ -188,6 +199,22 @@ const Details = () => {
           </ScrollView>
         </View>
       </Animated.View>
+      {items > 0 && (
+        <View style={styles.footer}>
+          <SafeAreaView
+            edges={["bottom"]}
+            style={{ flex: 1, backgroundColor: "#fff" }}
+          >
+            <Link href={"/basket"} asChild>
+              <TouchableOpacity style={styles.fullButton}>
+                <Text style={styles.basket}>{items}</Text>
+                <Text style={styles.footerText}>View Basket</Text>
+                <Text style={styles.basketTotal}>Total: ${total}</Text>
+              </TouchableOpacity>
+            </Link>
+          </SafeAreaView>
+        </View>
+      )}
     </>
   );
 };
@@ -302,6 +329,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 20,
     paddingBottom: 4,
+  },
+  footer: {
+    position: "absolute",
+    backgroundColor: "#fff",
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    padding: 10,
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    paddingTop: 20,
+  },
+  basketTotal: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  basket: {
+    color: "#fff",
+    backgroundColor: "#19aa86",
+    fontWeight: "bold",
+    padding: 8,
+    borderRadius: 2,
+  },
+  footerText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  fullButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    flexDirection: "row",
+    flex: 1,
+    justifyContent: "space-between",
+    height: 50,
   },
 });
 
